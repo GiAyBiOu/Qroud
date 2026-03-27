@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { ApiResponse } from "@/lib/api/response";
+import { withErrorHandler } from "@/lib/api/errors";
 import logger from "@/lib/logger";
 
-export async function GET() {
+export const GET = withErrorHandler(async () => {
   const payload = {
     status: "ok",
     timestamp: new Date().toISOString(),
@@ -11,5 +12,5 @@ export async function GET() {
 
   logger.info(payload, "Health check requested");
 
-  return NextResponse.json(payload);
-}
+  return ApiResponse.success(payload);
+});

@@ -16,7 +16,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Qroud - Digital Ticket Platform",
   description:
-    "Digital ticket issuance and validation platform with QR codes for events. Generate, distribute, and validate tickets in real time.",
+    "Issue, distribute, and validate QR-coded digital tickets for events in real time.",
+  icons: {
+    icon: "/qroud.png",
+    apple: "/qroud.png",
+  },
 };
 
 export default function RootLayout({
