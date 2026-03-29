@@ -1,14 +1,39 @@
 # Qroud
 
-Digital ticket issuance and validation platform with QR codes for events. It allows organizers to generate unique entries, download or print them, and validate them at the door by scanning from any device with a camera, marking them as used in real time.
+Digital ticket issuance and validation platform with QR codes for live events. Organizers can browse public events, generate unique QR-coded tickets, and validate them at the door by scanning from any camera-equipped device.
 
 ## Tech Stack
 
-- Next.js (React, TypeScript)
-- Supabase (PostgreSQL, serverless functions, real-time subscriptions, authentication)
-- Pino (structured logging)
-- Zod (runtime validation)
-- Ticketmaster Discovery API (public event data)
+- **Runtime**: Node.js 18+ (declared via `engines` in `package.json`)
+- **Framework**: Next.js 16 (React 19, TypeScript)
+- **Database & Auth**: Supabase (PostgreSQL + Auth with Google OAuth)
+- **Logging**: Pino (structured JSON to stdout)
+- **Validation**: Zod v4 (runtime schema validation)
+- **Events Data**: Ticketmaster Discovery API (free tier, 5000 req/day)
+- **Containerization**: Docker (multi-stage build)
+
+## Quick Start
+
+```sh
+cd web
+cp .env.example .env.local   # Fill in your credentials
+pnpm install
+pnpm dev                     # Starts on PORT from .env (default 3000)
+```
+
+For Docker:
+
+```sh
+docker compose up --build
+```
+
+## Setup Guides
+
+Detailed setup instructions are in the `docs/` folder:
+
+- [Supabase Setup](docs/supabase-setup.md) - Database schema, environment variables, and RLS policies
+- [Google OAuth Setup](docs/google-oauth-setup.md) - Enable "Sign in with Google" via Google Cloud Console
+- [Ticketmaster Setup](docs/ticketmaster-setup.md) - Obtain a free API key for the events listing
 
 ## API Endpoints (v1)
 
@@ -17,98 +42,43 @@ All endpoints are versioned under `/api/v1`. Responses follow JSON:API specifica
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/v1/health` | Service health check |
-| GET | `/api/v1/events` | List events from Ticketmaster |
-| GET | `/api/v1/tickets?event_id=<uuid>` | List tickets by event |
-| POST | `/api/v1/tickets` | Create a ticket |
+| GET | `/api/v1/events` | List events (Ticketmaster proxy) |
+| GET | `/api/v1/events/:id` | Single event details |
+| GET | `/api/v1/tickets?event_id=<id>` | List tickets by event |
+| POST | `/api/v1/tickets` | Issue a QR ticket |
 | POST | `/api/v1/validate` | Validate a ticket by QR payload |
-
-## High-Level Requirements
-
-1. **Ticket Generation** - Create unique QR-coded digital tickets tied to specific events, available for download or print.
-2. **Real-Time Validation** - Scan and validate tickets at event entry using any device camera, updating their status instantly via Supabase real-time.
-3. **Event Management** - Basic CRUD for events, with each event linked to its pool of generated tickets.
-
-## Prerequisites
-
-- Node.js 18+
-- pnpm
-- A Supabase project
-- A Ticketmaster Developer account (free)
-
-## Environment Setup
-
-1. Copy the environment template:
-   ```sh
-   cp web/.env.example web/.env.local
-   ```
-2. Fill in your credentials in `web/.env.local`:
-   - **Supabase**: Get your URL, anon key, and service role key from your Supabase project dashboard under Settings > API.
-   - **Ticketmaster**: Register at https://developer.ticketmaster.com/ and copy your Consumer Key.
-
-## Supabase Database Setup
-
-Run the following SQL in your Supabase SQL Editor (Dashboard > SQL Editor > New Query):
-
-```sql
-CREATE TABLE tickets (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  event_id TEXT NOT NULL,
-  qr_payload UUID NOT NULL UNIQUE,
-  holder_email TEXT NOT NULL,
-  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'used', 'cancelled')),
-  used_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE INDEX idx_tickets_event_id ON tickets(event_id);
-CREATE INDEX idx_tickets_qr_payload ON tickets(qr_payload);
-```
-
-## Google OAuth Setup
-
-1. Go to your Supabase Dashboard > Authentication > Providers > Google.
-2. Enable the Google provider.
-3. Create OAuth credentials at https://console.cloud.google.com/apis/credentials.
-4. Set the authorized redirect URI to:
-   ```
-   https://<your-project-ref>.supabase.co/auth/v1/callback
-   ```
-5. Copy the Client ID and Client Secret into the Supabase Google provider settings.
-
-## Running Locally
-
-```sh
-cd web
-pnpm install
-pnpm dev
-```
-
-The server shall start on the port defined by the `PORT` environment variable (default: `3000`).
 
 ## Project Structure
 
 ```
-web/
-  app/
-    api/v1/
-      health/          Health check endpoint
-      events/          Ticketmaster events proxy
-      tickets/         Ticket CRUD endpoint
-      validate/        Ticket validation endpoint
-    auth/
-      login/           Login page (Google + email)
-      signup/          Sign-up page
-      callback/        OAuth callback handler
-  features/
-    auth/              Auth service layer
-    events/            Events service (Ticketmaster)
-    tickets/           Ticket service + data + schema
-    validate/          Validation service + data + schema
-  lib/
-    api/               Response DTOs, error handling, validation
-    supabase/          Supabase client factories
-    config.ts          Centralized env config
-    logger.ts          Pino logger instance
+Qroud/
+  docs/                        Setup guides
+  docker-compose.yml           Container orchestration
+  web/
+    Dockerfile                 Multi-stage production build
+    .env.example               Environment variable template
+    app/
+      api/v1/
+        health/                Health check endpoint
+        events/                Events list + [eventId] detail
+        tickets/               Ticket CRUD endpoint
+        validate/              Ticket validation endpoint
+      auth/
+        login/                 Login page (Google + email)
+        signup/                Sign-up page
+        callback/              OAuth callback handler
+      events/
+        [eventId]/             Event detail page with ticket issuance
+    features/
+      auth/                    Auth service layer
+      events/                  Events service (Ticketmaster integration)
+      tickets/                 Ticket service + data + schema
+      validate/                Validation service + data + schema
+    lib/
+      api/                     Response DTOs, error handling, validation
+      supabase/                Supabase client factories
+      config.ts                Centralized environment config
+      logger.ts                Pino logger instance (stdout)
 ```
 
 ## License

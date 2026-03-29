@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 
 interface EventDTO {
   id: string;
@@ -122,11 +123,9 @@ export function EventsList() {
     <>
       <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 transition-opacity duration-300 ${navigating ? "opacity-50" : "opacity-100"}`}>
         {events.map((event) => (
-          <a
+          <Link
             key={event.id}
-            href={event.url}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`/events/${event.id}`}
             className="group relative flex flex-col rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden transition-all duration-400 hover:bg-white/[0.05] hover:border-amber-500/20 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/[0.08]"
           >
             <div className="relative h-52 bg-zinc-900/50 overflow-hidden">
@@ -193,7 +192,7 @@ export function EventsList() {
             </div>
 
             <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          </a>
+          </Link>
         ))}
       </div>
 

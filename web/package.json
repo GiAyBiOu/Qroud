@@ -2,11 +2,16 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "docker:build": "docker compose -f ../docker-compose.yml build",
+    "docker:up": "docker compose -f ../docker-compose.yml up -d"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",

@@ -1,4 +1,5 @@
 import logger from "@/lib/logger";
+import config from "@/lib/config";
 
 interface TicketmasterImage {
   url: string;
@@ -26,6 +27,7 @@ interface TicketmasterEvent {
   id: string;
   name: string;
   url: string;
+  info?: string;
   dates?: {
     start?: {
       localDate?: string;
@@ -65,10 +67,9 @@ export interface EventDTO {
   priceMax: number | null;
   priceCurrency: string | null;
   image: string | null;
+  info: string | null;
   url: string;
 }
-
-const BASE_URL = "https://app.ticketmaster.com/discovery/v2/events.json";
 
 function pickBestImage(images?: TicketmasterImage[]): string | null {
   if (!images || images.length === 0) return null;
@@ -107,6 +108,7 @@ function toEventDTO(event: TicketmasterEvent): EventDTO {
     priceMax: price?.max ?? null,
     priceCurrency: price?.currency ?? null,
     image: pickBestImage(event.images),
+    info: event.info ?? null,
     url: event.url,
   };
 }
@@ -118,14 +120,14 @@ export async function fetchEvents(params: {
   size?: number;
   page?: number;
 }): Promise<{ events: EventDTO[]; total: number; totalPages: number }> {
-  const apiKey = process.env.TICKETMASTER_API_KEY;
+  const { apiKey, baseUrl } = config.ticketmaster;
 
   if (!apiKey) {
     logger.warn("TICKETMASTER_API_KEY is not configured");
     return { events: [], total: 0, totalPages: 0 };
   }
 
-  const url = new URL(BASE_URL);
+  const url = new URL(`${baseUrl}/events.json`);
   url.searchParams.set("apikey", apiKey);
   url.searchParams.set("size", String(params.size ?? 12));
   url.searchParams.set("page", String(params.page ?? 0));
@@ -154,4 +156,28 @@ export async function fetchEvents(params: {
     total,
     totalPages,
   };
+}
+
+export async function fetchEventById(eventId: string): Promise<EventDTO | null> {
+  const { apiKey, baseUrl } = config.ticketmaster;
+
+  if (!apiKey) {
+    logger.warn("TICKETMASTER_API_KEY is not configured");
+    return null;
+  }
+
+  const url = new URL(`${baseUrl}/events/${eventId}.json`);
+  url.searchParams.set("apikey", apiKey);
+
+  const response = await fetch(url.toString());
+
+  if (!response.ok) {
+    logger.error({ status: response.status, eventId }, "Ticketmaster event lookup failed");
+    return null;
+  }
+
+  const data: TicketmasterEvent = await response.json();
+  logger.info({ eventId }, "Single event fetched from Ticketmaster");
+
+  return toEventDTO(data);
 }
