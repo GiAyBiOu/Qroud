@@ -24,7 +24,8 @@ pnpm dev                     # Starts on PORT from .env (default 3000)
 For Docker:
 
 ```sh
-docker compose up --build
+# Run from the root Qroud/ directory
+docker compose -f docker/docker-compose.yml up --build
 ```
 
 ## Setup Guides
@@ -52,11 +53,14 @@ All endpoints are versioned under `/api/v1`. Responses follow JSON:API specifica
 
 ```
 Qroud/
+  .github/                     CI/CD deployment pipelines
   docs/                        Setup guides
-  docker-compose.yml           Container orchestration
+  docker/                      Container orchestration (Dev, Prod, Swarm)
+  scripts/                     Administrative script wrappers (SemVer)
   web/
     Dockerfile                 Multi-stage production build
     .env.example               Environment variable template
+    package.json               Contains "docker:build" and "docker:up" scripts
     app/
       api/v1/
         health/                Health check endpoint
