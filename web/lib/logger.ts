@@ -19,7 +19,11 @@ function handleShutdown(signal: string) {
   process.exit(0);
 }
 
-process.on("SIGTERM", () => handleShutdown("SIGTERM"));
-process.on("SIGINT", () => handleShutdown("SIGINT"));
+// Only attach manual process exits if NOT running on Vercel.
+// Vercel Serverless Functions need to manage their own lifecycle
+if (!process.env.VERCEL) {
+  process.on("SIGTERM", () => handleShutdown("SIGTERM"));
+  process.on("SIGINT", () => handleShutdown("SIGINT"));
+}
 
 export default logger;
