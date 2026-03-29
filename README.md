@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="web/public/qroud.png" alt="Qroud Platform" width="200" style="border-radius: 20px;" />
+</div>
+
 # Qroud
 
 Digital ticket issuance and validation platform with QR codes for live events. Organizers can browse public events, generate unique QR-coded tickets, and validate them at the door by scanning from any camera-equipped device.
