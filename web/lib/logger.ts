@@ -1,17 +1,23 @@
 import pino from "pino";
 import config from "@/lib/config";
 
+const isProduction = config.nodeEnv === "production";
+
 const logger = pino({
   level: config.logLevel,
-  transport: {
-    target: "pino-pretty",
-    options: {
-      colorize: true,
-      ignore: "pid,hostname",
-      translateTime: "HH:MM:ss.l",
-      singleLine: false,
-    },
-  },
+  ...(isProduction
+    ? {}
+    : {
+        transport: {
+          target: "pino-pretty",
+          options: {
+            colorize: true,
+            ignore: "pid,hostname",
+            translateTime: "HH:MM:ss.l",
+            singleLine: false,
+          },
+        },
+      }),
 });
 
 function handleShutdown(signal: string) {
@@ -19,8 +25,6 @@ function handleShutdown(signal: string) {
   process.exit(0);
 }
 
-// Only attach manual process exits if NOT running on Vercel.
-// Vercel Serverless Functions need to manage their own lifecycle
 if (!process.env.VERCEL) {
   process.on("SIGTERM", () => handleShutdown("SIGTERM"));
   process.on("SIGINT", () => handleShutdown("SIGINT"));
