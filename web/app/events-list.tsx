@@ -216,7 +216,7 @@ export function EventsList() {
               const half = Math.floor(maxVisible / 2);
               const cappedTotal = Math.min(totalPages, 100);
               let start = Math.max(0, page - half);
-              let end = Math.min(cappedTotal, start + maxVisible);
+              const end = Math.min(cappedTotal, start + maxVisible);
               if (end - start < maxVisible) start = Math.max(0, end - maxVisible);
 
               const buttons = [];
