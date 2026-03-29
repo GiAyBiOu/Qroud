@@ -3,6 +3,9 @@ import { withErrorHandler, NotFoundError } from "@/lib/api/errors";
 import { fetchEventById } from "@/features/events/events.service";
 import { NextRequest } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ eventId: string }> }

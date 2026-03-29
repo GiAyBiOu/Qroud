@@ -2,6 +2,9 @@ import { ApiResponse } from "@/lib/api/response";
 import { withErrorHandler } from "@/lib/api/errors";
 import logger from "@/lib/logger";
 
+export const dynamic = 'force-dynamic';
+
+
 export const GET = withErrorHandler(async () => {
   const payload = {
     status: "ok",

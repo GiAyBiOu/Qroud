@@ -2,6 +2,9 @@ import { ApiResponse } from "@/lib/api/response";
 import { withErrorHandler } from "@/lib/api/errors";
 import { fetchEvents } from "@/features/events/events.service";
 
+export const dynamic = 'force-dynamic';
+
+
 export const GET = withErrorHandler(async (request) => {
   const url = new URL(request.url);
   const keyword = url.searchParams.get("keyword") ?? undefined;

@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web:
+    image: qroud-web:latest
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    deploy:
+      mode: replicated
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.role == worker

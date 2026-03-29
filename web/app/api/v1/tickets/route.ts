@@ -4,6 +4,9 @@ import { parseBody, parseSearchParam } from "@/lib/api/validate";
 import { CreateTicketSchema } from "@/features/tickets/tickets.schema";
 import { createTicket, listTickets } from "@/features/tickets/tickets.service";
 
+export const dynamic = 'force-dynamic';
+
+
 export const GET = withErrorHandler(async (request) => {
   const url = new URL(request.url);
   const eventId = parseSearchParam(url, "event_id", true)!;

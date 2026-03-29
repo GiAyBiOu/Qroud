@@ -10,8 +10,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "docker:build": "docker compose -f ../docker-compose.yml build",
-    "docker:up": "docker compose -f ../docker-compose.yml up -d"
+    "docker:build": "docker compose -f ../docker/docker-compose.yml build",
+    "docker:up": "docker compose -f ../docker/docker-compose.yml up -d",
+    "release:bump": "bash ../scripts/bump-version.sh"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",

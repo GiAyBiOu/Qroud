@@ -4,6 +4,9 @@ import { parseBody } from "@/lib/api/validate";
 import { ValidateTicketSchema } from "@/features/validate/validate.schema";
 import { validateTicket } from "@/features/validate/validate.service";
 
+export const dynamic = 'force-dynamic';
+
+
 export const POST = withErrorHandler(async (request) => {
   const input = await parseBody(request, ValidateTicketSchema);
   const result = await validateTicket(input.qr_payload);

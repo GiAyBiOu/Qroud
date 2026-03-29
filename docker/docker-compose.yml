@@ -1,12 +1,12 @@
 services:
   web:
     build:
-      context: ./web
+      context: ../web
       dockerfile: Dockerfile
     ports:
       - "${PORT:-3000}:3000"
     env_file:
-      - ./web/.env.local
+      - ../web/.env.local
     environment:
       - NODE_ENV=production
     restart: unless-stopped
